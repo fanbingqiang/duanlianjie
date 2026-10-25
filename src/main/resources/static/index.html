@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>短链接 · 阶段1 测试台</title>
+  <style>
+    :root {
+      --blue: #2f6db5;
+      --blue-light: #eaf2fb;
+      --line: #d8e4f2;
+      --text: #111111;
+      --muted: #5c6673;
+      --page-bg: #f6faff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: var(--page-bg);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text);
+    }
+
+    .brand span {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      background: var(--blue-light);
+      border-radius: 10px;
+      vertical-align: middle;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 20px 56px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(47, 109, 181, 0.06);
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card p.hint {
+      margin: 0 0 18px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      font-size: 14px;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(47, 109, 181, 0.12);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .row > .grow { flex: 1 1 320px; }
+    .row > .small { flex: 0 1 180px; }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .btn {
+      height: 40px;
+      padding: 0 18px;
+      font-size: 14px;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid #b9cbe0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn:hover {
+      background: #eef4fb;
+      border-color: #9db9d9;
+    }
+
+    .btn:active {
+      background: #e2ecf8;
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn.primary {
+      background: #ffffff;
+      border-color: #7f9fc4;
+      font-weight: 600;
+      box-shadow: inset 3px 0 0 var(--blue);
+    }
+
+    .btn.primary:hover {
+      background: #eaf2fb;
+    }
+
+    .status {
+      display: none;
+      margin-top: 16px;
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: #f8fbff;
+      word-break: break-all;
+    }
+
+    .status.show { display: block; }
+    .status.ok { border-color: #b9d5c2; background: #f2faf4; }
+    .status.err { border-color: #e3b8b8; background: #fdf4f4; }
+
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 16px;
+      background: #f8fbff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .result.show { display: block; }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 10px 12px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .kv .k { color: var(--muted); }
+    .kv .v { color: var(--text); word-break: break-all; }
+
+    .short-code {
+      display: inline-block;
+      padding: 2px 10px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px dashed #9db9d9;
+      border-radius: 6px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 18px 0;
+    }
+
+    .muted { color: var(--muted); font-size: 13px; line-height: 1.8; }
+
+    .footer {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 20px 32px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">短链接 ShortLink <span>阶段1</span></div>
+      <div class="muted">创建 · 302 跳转 · 详情</div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="card">
+      <h2>创建短链接</h2>
+      <p class="hint">输入以 http:// 或 https:// 开头的长链接。同一长链接重复创建会幂等返回同一个短码。</p>
+
+      <div class="field">
+        <label for="longUrl">长链接</label>
+        <input id="longUrl" type="text" placeholder="https://www.baidu.com" autocomplete="off">
+      </div>
+
+      <div class="row">
+        <div class="field small">
+          <label for="expireDays">过期天数（可选）</label>
+          <input id="expireDays" type="number" min="1" placeholder="不填则永不过期">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="btnCreate" class="btn primary" type="button">生成短链接</button>
+        <button id="btnFillDemo" class="btn" type="button">填入示例</button>
+      </div>
+
+      <div id="createStatus" class="status"></div>
+
+      <div id="createResult" class="result">
+        <div class="kv">
+          <div class="k">短码</div>
+          <div class="v"><span id="rShortCode" class="short-code"></span></div>
+          <div class="k">短链接</div>
+          <div class="v"><span id="rShortUrl"></span></div>
+          <div class="k">长链接</div>
+          <div class="v"><span id="rLongUrl"></span></div>
+          <div class="k">访问次数</div>
+          <div class="v"><span id="rVisitCount"></span></div>
+          <div class="k">创建时间</div>
+          <div class="v"><span id="rCreateTime"></span></div>
+          <div class="k">过期时间</div>
+          <div class="v"><span id="rExpireTime"></span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="actions">
+          <button id="btnOpen" class="btn" type="button">打开短链接（302 跳转）</button>
+          <button id="btnCopy" class="btn" type="button">复制短链接</button>
+          <button id="btnDetailFromResult" class="btn" type="button">查询该短码详情</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>查询详情</h2>
+      <p class="hint">输入短码查询长链接、访问次数、创建时间与过期时间。接口：GET /api/shortlink/{shortCode}</p>
+
+      <div class="field">
+        <label for="shortCode">短码</label>
+        <input id="shortCode" type="text" placeholder="例如 1aB3dK9xYz" autocomplete="off">
+      </div>
+
+      <div class="actions">
+        <button id="btnQuery" class="btn primary" type="button">查询详情</button>
+        <button id="btnGo" class="btn" type="button">直接访问短码</button>
+      </div>
+
+      <div id="queryStatus" class="status"></div>
+
+      <div id="queryResult" class="result">
+        <div class="kv">
+          <div class="k">短码</div>
+          <div class="v"><span id="qShortCode" class="short-code"></span></div>
+          <div class="k">短链接</div>
+          <div class="v"><span id="qShortUrl"></span></div>
+          <div class="k">长链接</div>
+          <div class="v"><span id="qLongUrl"></span></div>
+          <div class="k">访问次数</div>
+          <div class="v"><span id="qVisitCount"></span></div>
+          <div class="k">创建时间</div>
+          <div class="v"><span id="qCreateTime"></span></div>
+          <div class="k">过期时间</div>
+          <div class="v"><span id="qExpireTime"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>使用说明</h2>
+      <p class="muted">
+        1. 创建成功后，浏览器访问短链接应收到 302 并跳转到原长链接。<br>
+        2. 同一长链接重复创建，返回的短码相同（幂等）。<br>
+        3. 访问不存在的短码，跳转接口返回 404。<br>
+        4. 本页仅用于阶段1联调，不包含访问统计与限流（阶段2-4）。
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">Spring Boot + MyBatis-Plus + MySQL · 阶段1 测试台</footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var currentShortUrl = "";
+
+      function $(id) {
+        return document.getElementById(id);
+      }
+
+      function showStatus(el, message, type) {
+        el.textContent = message;
+        el.className = "status show" + (type ? " " + type : "");
+      }
+
+      function hideStatus(el) {
+        el.className = "status";
+        el.textContent = "";
+      }
+
+      function formatTime(value) {
+        if (!value) {
+          return "永不过期";
+        }
+        return String(value).replace("T", " ");
+      }
+
+      function renderResult(prefix, data) {
+        $(prefix + "ShortCode").textContent = data.shortCode || "-";
+        $(prefix + "ShortUrl").textContent = data.shortUrl || "-";
+        $(prefix + "LongUrl").textContent = data.longUrl || "-";
+        $(prefix + "VisitCount").textContent = (data.visitCount === null || data.visitCount === undefined) ? "0" : data.visitCount;
+        $(prefix + "CreateTime").textContent = formatTime(data.createTime);
+        $(prefix + "ExpireTime").textContent = data.expireTime ? formatTime(data.expireTime) : "永不过期";
+      }
+
+      function requestJson(url, options) {
+        return fetch(url, options).then(function (resp) {
+          return resp.json().then(function (body) {
+            return { ok: resp.ok, status: resp.status, body: body };
+          });
+        });
+      }
+
+      function createShortLink() {
+        var longUrl = $("longUrl").value.trim();
+        var expireDaysRaw = $("expireDays").value.trim();
+        var statusEl = $("createStatus");
+
+        if (!longUrl) {
+          showStatus(statusEl, "请先填写长链接", "err");
+          return;
+        }
+
+        var payload = { longUrl: longUrl };
+        if (expireDaysRaw !== "") {
+          payload.expireDays = Number(expireDaysRaw);
+        }
+
+        var btn = $("btnCreate");
+        btn.disabled = true;
+        showStatus(statusEl, "正在创建...", "");
+
+        requestJson("/api/shortlink/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }).then(function (res) {
+          if (res.body && res.body.code === 200 && res.body.data) {
+            currentShortUrl = res.body.data.shortUrl || "";
+            renderResult("r", res.body.data);
+            $("createResult").className = "result show";
+            $("shortCode").value = res.body.data.shortCode || "";
+            showStatus(statusEl, "创建成功，短码：" + res.body.data.shortCode, "ok");
+          } else {
+            showStatus(statusEl, (res.body && res.body.msg) || ("创建失败，HTTP " + res.status), "err");
+          }
+        }).catch(function (err) {
+          showStatus(statusEl, "请求失败：" + err.message, "err");
+        }).then(function () {
+          btn.disabled = false;
+        });
+      }
+
+      function queryDetail() {
+        var code = $("shortCode").value.trim();
+        var statusEl = $("queryStatus");
+
+        if (!code) {
+          showStatus(statusEl, "请先填写短码", "err");
+          return;
+        }
+
+        var btn = $("btnQuery");
+        btn.disabled = true;
+        showStatus(statusEl, "正在查询...", "");
+
+        requestJson("/api/shortlink/" + encodeURIComponent(code), {
+          method: "GET"
+        }).then(function (res) {
+          if (res.body && res.body.code === 200 && res.body.data) {
+            renderResult("q", res.body.data);
+            $("queryResult").className = "result show";
+            showStatus(statusEl, "查询成功", "ok");
+          } else {
+            showStatus(statusEl, (res.body && res.body.msg) || ("查询失败，HTTP " + res.status), "err");
+          }
+        }).catch(function (err) {
+          showStatus(statusEl, "请求失败：" + err.message, "err");
+        }).then(function () {
+          btn.disabled = false;
+        });
+      }
+
+      function openShortUrl() {
+        var url = currentShortUrl;
+        if (!url) {
+          var code = $("shortCode").value.trim();
+          if (!code) {
+            showStatus($("createStatus"), "还没有可打开的短链接，请先创建或填写短码", "err");
+            return;
+          }
+          url = window.location.origin + "/" + encodeURIComponent(code);
+        }
+        window.open(url, "_blank");
+      }
+
+      function copyShortUrl() {
+        var url = currentShortUrl;
+        if (!url) {
+          var code = $("shortCode").value.trim();
+          url = code ? window.location.origin + "/" + encodeURIComponent(code) : "";
+        }
+        if (!url) {
+          showStatus($("createStatus"), "还没有可复制的短链接", "err");
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function () {
+            showStatus($("createStatus"), "已复制：" + url, "ok");
+          }).catch(function () {
+            showStatus($("createStatus"), "复制失败，请手动复制：" + url, "err");
+          });
+        } else {
+          showStatus($("createStatus"), "当前浏览器不支持自动复制，请手动复制：" + url, "err");
+        }
+      }
+
+      function goShortCode() {
+        var code = $("shortCode").value.trim();
+        if (!code) {
+          showStatus($("queryStatus"), "请先填写短码", "err");
+          return;
+        }
+        window.open(window.location.origin + "/" + encodeURIComponent(code), "_blank");
+      }
+
+      function detailFromResult() {
+        var code = $("rShortCode").textContent.trim();
+        if (!code || code === "-") {
+          showStatus($("createStatus"), "还没有创建过短链接", "err");
+          return;
+        }
+        $("shortCode").value = code;
+        queryDetail();
+      }
+
+      function fillDemo() {
+        $("longUrl").value = "https://www.baidu.com";
+        $("expireDays").value = "";
+        hideStatus($("createStatus"));
+      }
+
+      $("btnCreate").addEventListener("click", createShortLink);
+      $("btnFillDemo").addEventListener("click", fillDemo);
+      $("btnOpen").addEventListener("click", openShortUrl);
+      $("btnCopy").addEventListener("click", copyShortUrl);
+      $("btnDetailFromResult").addEventListener("click", detailFromResult);
+      $("btnQuery").addEventListener("click", queryDetail);
+      $("btnGo").addEventListener("click", goShortCode);
+    })();
+  </script>
+</body>
+</html>

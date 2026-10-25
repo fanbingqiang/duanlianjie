@@ -1,0 +1,24 @@
+# 本地配置模板：复制为 application-local.yml 后按自己的环境修改。
+# application-local.yml 已加入 .gitignore，不会提交到仓库。
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shortlink?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 改成你的数据库密码
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 3000ms
+
+shortlink:
+  domain: http://localhost:8080/
+  worker-id: 1

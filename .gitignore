@@ -1,0 +1,47 @@
+# ===== 本地配置（含数据库密码，禁止提交）=====
+src/main/resources/application-local.yml
+
+# ===== 构建产物 =====
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.war
+
+# ===== IDE =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.sts4-cache/
+.settings/
+.project
+.classpath
+
+# ===== 日志 / 临时文件 =====
+logs/
+*.log
+*.tmp
+*.bak
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== 压测/验收临时产物 =====
+jmeter.log
+*.jtl
+
+### push-cleanup: build artifacts, IDE, secrets
+target/
+node_modules/
+.idea/
+.vscode/
+.env
+.env.*
+application*.yml
+application*.yaml
+application*.properties
+*.log
